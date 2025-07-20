@@ -1,0 +1,18 @@
+[
+    {
+        "id": "1",
+        "name": "Ancien Hôpital Abandonné",
+        "lat": 48.8566,
+        "lng": 2.3522,
+        "description": "Un grand complexe hospitalier désaffecté avec une histoire fascinante.",
+        "image": "https://example.com/image1.jpg"
+    },
+    {
+        "id": "2",
+        "name": "Usine de Textile en Ruine",
+        "lat": 45.764,
+        "lng": 4.8357,
+        "description": "Immense usine industrielle, vestiges de l'ère de la révolution industrielle.",
+        "image": "https://example.com/image2.jpg"
+    }
+]
