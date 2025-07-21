@@ -9,24 +9,22 @@ var mapContainer = document.getElementById('map');
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 
-// --- Définition du style du marqueur en utilisant TON image de l'épingle Google Maps ---
+// --- Définition du style du marqueur comme l'épingle rouge de Google Maps ---
 var markerGoogleMapsStyle = new ol.style.Style({
     image: new ol.style.Icon({
-        // L'ancre est importante pour que la pointe de l'épingle soit sur les coordonnées.
-        // Les valeurs 0.5 et 1 placent l'ancre au milieu de la largeur et en bas de l'image.
-        anchor: [0.5, 1], 
+        anchor: [0.5, 1], // Le point d'ancrage est le bas de l'épingle
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
-        // <<< Remplace 'data/google-maps-pin.png' par le chemin exact de ton image sur GitHub >>>
-        src: 'data/google-maps-pin.png', 
-        scale: 1 // Garde la taille originale de l'icône. Ajuste si l'image est trop grande/petite.
+        // C'EST L'URL DE L'ÉPINGLE ROUGE OFFICIELLE DE GOOGLE MAPS.
+        src: 'https://maps.gstatic.com/mapfiles/markers/red/marker.png', 
+        scale: 1 // Garde la taille originale de l'icône
     })
 });
 
 var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
 var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
-    style: markerGoogleMapsStyle // Applique le style d'épingle basé sur ton image
+    style: markerGoogleMapsStyle // Applique le style d'épingle Google Maps
 });
 
 // Création du conteneur popup
