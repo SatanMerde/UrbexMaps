@@ -12,34 +12,7 @@
 <body>
     <div id="search-container">
         <input type="text" id="search-input" placeholder="Rechercher un lieu...">
-        <button id="toggle-add-location-form">Ajouter un lieu</button>
-    </div>
-
-    <div id="add-location-form-container" style="display: none;">
-        <h2>Ajouter un nouveau lieu Urbex</h2>
-        <form id="add-location-form">
-            <label for="new-location-name">Nom du lieu:</label>
-            <input type="text" id="new-location-name" required><br>
-
-            <label for="new-location-description">Description:</label>
-            <textarea id="new-location-description" required></textarea><br>
-
-            <label for="new-location-lat">Latitude:</label>
-            <input type="number" id="new-location-lat" step="any" required><br>
-
-            <label for="new-location-lng">Longitude:</label>
-            <input type="number" id="new-location-lng" step="any" required><br>
-
-            <label for="new-location-image">URL de l'image (optionnel):</label>
-            <input type="text" id="new-location-image"><br>
-
-            <button type="submit">Ajouter à la carte (temporaire)</button>
-        </form>
-        <p class="info-message">
-            **Note:** L'ajout est temporaire. Pour rendre un lieu permanent, tu devras l'ajouter manuellement au fichier `data/locations.json` sur GitHub.
-            Clique sur la carte pour obtenir les coordonnées Latitude/Longitude.
-        </p>
-    </div>
+        </div>
 
     <div id="main-content">
         <div id="results-sidebar">
