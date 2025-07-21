@@ -4,8 +4,18 @@
 var resultsList = document.getElementById('results-list');
 var resultsSidebar = document.getElementById('results-sidebar');
 var searchInput = document.getElementById('search-input');
-// var mapStyleSelector = document.getElementById('map-style-selector'); // Désactivé car le sélecteur est retiré
 var mapContainer = document.getElementById('map');
+
+// Nouveaux éléments pour l'ajout de lieu
+var toggleAddLocationFormButton = document.getElementById('toggle-add-location-form');
+var addLocationFormContainer = document.getElementById('add-location-form-container');
+var addLocationForm = document.getElementById('add-location-form');
+var newLocationNameInput = document.getElementById('new-location-name');
+var newLocationDescriptionInput = document.getElementById('new-location-description');
+var newLocationLatInput = document.getElementById('new-location-lat');
+var newLocationLngInput = document.getElementById('new-location-lng');
+var newLocationImageInput = document.getElementById('new-location-image');
+
 
 // Données des lieux
 var allLocations = [];
@@ -53,7 +63,7 @@ popupCloser.onclick = function() {
 // Définition du fond de carte OpenStreetMap de base
 const osmLayer = new ol.layer.Tile({
     source: new ol.source.OSM(),
-    properties: { name: 'osm' } // Garde le nom pour la cohérence
+    properties: { name: 'osm' }
 });
 
 // Initialisation de la carte OpenLayers
@@ -75,9 +85,6 @@ map.addLayer(vectorLayer);
 
 // --- Fonctions de gestion ---
 
-// Les fonctions de changement de fond de carte sont maintenant inutiles car il n'y a qu'une seule carte
-// et le sélecteur a été retiré.
-
 // Chargement des lieux depuis le fichier JSON
 fetch('data/locations.json')
     .then(response => {
@@ -88,7 +95,7 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        // Laisser la liste et les marqueurs vides au démarrage
+        displayMarkersAndList(allLocations); // Affiche tous les marqueurs au démarrage
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
@@ -154,9 +161,7 @@ function displayMarkersAndList(locationsToDisplay) {
 }
 
 // Fonction pour ouvrir Google Maps en vue satellite
-// Rendre cette fonction globale pour qu'elle puisse être appelée depuis le HTML du popup
 window.openGoogleMaps = function(lat, lng) {
-    // Utilisation de l'URL Google Maps avec des paramètres pour la vue satellite et un zoom pertinent
     var googleMapsUrl = `https://www.google.com/maps/@${lat},${lng},17z/data=!3m1!1e3?hl=fr`; 
     window.open(googleMapsUrl, '_blank');
 };
@@ -169,8 +174,7 @@ searchInput.addEventListener('keyup', function() {
     var searchTerm = searchInput.value.toLowerCase();
 
     if (searchTerm === '') {
-        resultsSidebar.style.display = 'none';
-        vectorSource.clear(); // Supprimer tous les marqueurs
+        displayMarkersAndList(allLocations); // Affiche tous les marqueurs si la recherche est vide
         popupOverlay.setPosition(undefined); // Cacher le popup
         return;
     }
@@ -183,14 +187,65 @@ searchInput.addEventListener('keyup', function() {
     displayMarkersAndList(filteredLocations);
 });
 
-// L'écouteur pour le sélecteur de style de carte est retiré car le sélecteur est retiré
+// Écouteur de clic sur le bouton "Ajouter un lieu"
+toggleAddLocationFormButton.addEventListener('click', function() {
+    if (addLocationFormContainer.style.display === 'none') {
+        addLocationFormContainer.style.display = 'block';
+        this.textContent = 'Masquer le formulaire';
+    } else {
+        addLocationFormContainer.style.display = 'none';
+        this.textContent = 'Ajouter un lieu';
+    }
+});
 
-// Écouteur de clic sur la carte pour les popups
+// Écouteur de soumission du formulaire d'ajout de lieu
+addLocationForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Empêche le rechargement de la page
+
+    var newLocation = {
+        name: newLocationNameInput.value,
+        description: newLocationDescriptionInput.value,
+        lat: parseFloat(newLocationLatInput.value),
+        lng: parseFloat(newLocationLngInput.value),
+        image: newLocationImageInput.value || '' // L'image est facultative
+    };
+
+    if (isNaN(newLocation.lat) || isNaN(newLocation.lng)) {
+        alert("Veuillez entrer des coordonnées Latitude et Longitude valides.");
+        return;
+    }
+
+    // Ajoute le nouveau lieu à notre tableau en mémoire
+    allLocations.push(newLocation);
+
+    // Réaffiche tous les marqueurs pour inclure le nouveau
+    displayMarkersAndList(allLocations);
+
+    // Centre la carte sur le nouveau lieu
+    map.getView().animate({
+        center: ol.proj.fromLonLat([newLocation.lng, newLocation.lat]),
+        zoom: 15,
+        duration: 500
+    });
+
+    // Affiche un message de confirmation
+    alert("Lieu '" + newLocation.name + "' ajouté temporairement à la carte ! Pour le rendre permanent, ajoute-le au fichier data/locations.json.");
+
+    // Réinitialise le formulaire
+    addLocationForm.reset();
+    newLocationLatInput.value = ''; // S'assurer que les champs numériques sont bien vides
+    newLocationLngInput.value = '';
+});
+
+
+// Écouteur de clic sur la carte pour les popups ET pour obtenir les coordonnées
 map.on('click', function(evt) {
     var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
         return feature;
     });
+
     if (feature) {
+        // Clic sur un marqueur existant (affiche le popup)
         var coordinates = feature.getGeometry().getCoordinates();
         var props = feature.getProperties();
         
@@ -202,12 +257,18 @@ map.on('click', function(evt) {
         `;
         popupOverlay.setPosition(coordinates);
     } else {
-        popupOverlay.setPosition(undefined);
+        // Clic sur la carte sans marqueur (met à jour les champs lat/lng du formulaire)
+        popupOverlay.setPosition(undefined); // Cache le popup s'il était ouvert
+        var clickedCoords = ol.proj.toLonLat(evt.coordinate);
+        newLocationLngInput.value = clickedCoords[0].toFixed(6); // Longitude
+        newLocationLatInput.value = clickedCoords[1].toFixed(6); // Latitude
+        alert(`Coordonnées copiées dans le formulaire : Lat ${clickedCoords[1].toFixed(6)}, Lng ${clickedCoords[0].toFixed(6)}`);
     }
 });
 
 
-// Masquer la sidebar au chargement initial
+// Masquer la sidebar et le formulaire au chargement initial
 document.addEventListener('DOMContentLoaded', (event) => {
     resultsSidebar.style.display = 'none';
+    addLocationFormContainer.style.display = 'none'; // Cache le formulaire d'ajout au démarrage
 });
