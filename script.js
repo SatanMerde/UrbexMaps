@@ -6,19 +6,8 @@ var resultsSidebar = document.getElementById('results-sidebar');
 var searchInput = document.getElementById('search-input');
 var mapContainer = document.getElementById('map');
 
-// Nouveaux éléments pour l'ajout de lieu
-var toggleAddLocationFormButton = document.getElementById('toggle-add-location-form');
-var addLocationFormContainer = document.getElementById('add-location-form-container');
-var addLocationForm = document.getElementById('add-location-form');
-var newLocationNameInput = document.getElementById('new-location-name');
-var newLocationDescriptionInput = document.getElementById('new-location-description');
-var newLocationLatInput = document.getElementById('new-location-lat');
-var newLocationLngInput = document.getElementById('new-location-lng');
-var newLocationImageInput = document.getElementById('new-location-image');
-
-
 // Données des lieux
-var allLocations = [];
+var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
 var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
@@ -36,7 +25,7 @@ popupContainer.className = 'ol-popup';
 document.body.appendChild(popupContainer); 
 
 var popupCloser = document.createElement('a');
-popupCloser.href = '#';
+popupCloper.href = '#';
 popupCloser.className = 'ol-popup-closer';
 popupContainer.appendChild(popupCloser);
 
@@ -95,7 +84,7 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        displayMarkersAndList(allLocations); // Affiche tous les marqueurs au démarrage
+        displayMarkersAndList(allLocations); // Affiche TOUS les marqueurs au démarrage
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
@@ -174,7 +163,7 @@ searchInput.addEventListener('keyup', function() {
     var searchTerm = searchInput.value.toLowerCase();
 
     if (searchTerm === '') {
-        displayMarkersAndList(allLocations); // Affiche tous les marqueurs si la recherche est vide
+        displayMarkersAndList(allLocations); // Affiche TOUS les marqueurs si la recherche est vide
         popupOverlay.setPosition(undefined); // Cacher le popup
         return;
     }
@@ -187,58 +176,8 @@ searchInput.addEventListener('keyup', function() {
     displayMarkersAndList(filteredLocations);
 });
 
-// Écouteur de clic sur le bouton "Ajouter un lieu"
-toggleAddLocationFormButton.addEventListener('click', function() {
-    if (addLocationFormContainer.style.display === 'none') {
-        addLocationFormContainer.style.display = 'block';
-        this.textContent = 'Masquer le formulaire';
-    } else {
-        addLocationFormContainer.style.display = 'none';
-        this.textContent = 'Ajouter un lieu';
-    }
-});
 
-// Écouteur de soumission du formulaire d'ajout de lieu
-addLocationForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Empêche le rechargement de la page
-
-    var newLocation = {
-        name: newLocationNameInput.value,
-        description: newLocationDescriptionInput.value,
-        lat: parseFloat(newLocationLatInput.value),
-        lng: parseFloat(newLocationLngInput.value),
-        image: newLocationImageInput.value || '' // L'image est facultative
-    };
-
-    if (isNaN(newLocation.lat) || isNaN(newLocation.lng)) {
-        alert("Veuillez entrer des coordonnées Latitude et Longitude valides.");
-        return;
-    }
-
-    // Ajoute le nouveau lieu à notre tableau en mémoire
-    allLocations.push(newLocation);
-
-    // Réaffiche tous les marqueurs pour inclure le nouveau
-    displayMarkersAndList(allLocations);
-
-    // Centre la carte sur le nouveau lieu
-    map.getView().animate({
-        center: ol.proj.fromLonLat([newLocation.lng, newLocation.lat]),
-        zoom: 15,
-        duration: 500
-    });
-
-    // Affiche un message de confirmation
-    alert("Lieu '" + newLocation.name + "' ajouté temporairement à la carte ! Pour le rendre permanent, ajoute-le au fichier data/locations.json.");
-
-    // Réinitialise le formulaire
-    addLocationForm.reset();
-    newLocationLatInput.value = ''; // S'assurer que les champs numériques sont bien vides
-    newLocationLngInput.value = '';
-});
-
-
-// Écouteur de clic sur la carte pour les popups ET pour obtenir les coordonnées
+// Écouteur de clic sur la carte pour les popups (la logique pour obtenir les coordonnées est retirée)
 map.on('click', function(evt) {
     var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
         return feature;
@@ -257,18 +196,12 @@ map.on('click', function(evt) {
         `;
         popupOverlay.setPosition(coordinates);
     } else {
-        // Clic sur la carte sans marqueur (met à jour les champs lat/lng du formulaire)
         popupOverlay.setPosition(undefined); // Cache le popup s'il était ouvert
-        var clickedCoords = ol.proj.toLonLat(evt.coordinate);
-        newLocationLngInput.value = clickedCoords[0].toFixed(6); // Longitude
-        newLocationLatInput.value = clickedCoords[1].toFixed(6); // Latitude
-        alert(`Coordonnées copiées dans le formulaire : Lat ${clickedCoords[1].toFixed(6)}, Lng ${clickedCoords[0].toFixed(6)}`);
     }
 });
 
 
-// Masquer la sidebar et le formulaire au chargement initial
+// Masquer la sidebar au chargement initial
 document.addEventListener('DOMContentLoaded', (event) => {
     resultsSidebar.style.display = 'none';
-    addLocationFormContainer.style.display = 'none'; // Cache le formulaire d'ajout au démarrage
 });
