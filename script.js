@@ -15,8 +15,8 @@ var vectorLayer = new ol.layer.Vector({
     style: new ol.style.Style({
         image: new ol.style.Icon({
             anchor: [0.5, 1],
-            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut
-            // Ou une icône personnalisée : 'data/marker-icon.png' si tu en mets une
+            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut Leaflet (tu peux la changer)
+            // Ou une icône personnalisée si tu la places dans 'data/marker-icon.png' : 'data/marker-icon.png'
         })
     })
 });
@@ -51,23 +51,33 @@ popupCloser.onclick = function() {
 };
 
 
-// Définition des fonds de carte
+// Définition des fonds de carte avec des URLs plus fiables
 const osmLayer = new ol.layer.Tile({
     source: new ol.source.OSM(),
     properties: { name: 'osm' }
 });
 
-// Esri World Imagery (Satellite) - URL de tuiles XYZ
-const esriSatelliteLayer = new ol.layer.Tile({
+// Google Satellite
+const googleSatelliteLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
-        attributions: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        maxZoom: 19
+        url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        attributions: '© Google',
+        maxZoom: 20
     }),
-    properties: { name: 'esri-satellite' }
+    properties: { name: 'google-satellite' }
 });
 
-// Esri World Topo Map (Terrain)
+// Google Hybrid (Satellite avec rues et labels)
+const googleHybridLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+        attributions: '© Google',
+        maxZoom: 20
+    }),
+    properties: { name: 'google-hybrid' }
+});
+
+// Esri World Terrain (Topo Map)
 const esriTerrainLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
         attributions: 'Tiles © Esri — Esri, DeLorme, HERE, TomTom, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
@@ -86,17 +96,6 @@ const cartoDarkLayer = new ol.layer.Tile({
     }),
     properties: { name: 'carto-dark' }
 });
-
-// Wikimedia (Rues détaillées)
-const wikimediaLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: '© <a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png',
-        maxZoom: 19
-    }),
-    properties: { name: 'wikimedia' }
-});
-
 
 // Initialisation de la carte OpenLayers
 var map = new ol.Map({
@@ -133,8 +132,11 @@ function changeOpenLayersBasemap(style) {
         case 'osm':
             map.addLayer(osmLayer);
             break;
-        case 'esri-satellite':
-            map.addLayer(esriSatelliteLayer);
+        case 'google-satellite':
+            map.addLayer(googleSatelliteLayer);
+            break;
+        case 'google-hybrid':
+            map.addLayer(googleHybridLayer);
             break;
         case 'esri-terrain':
             map.addLayer(esriTerrainLayer);
@@ -142,15 +144,11 @@ function changeOpenLayersBasemap(style) {
         case 'carto-dark':
             map.addLayer(cartoDarkLayer);
             break;
-        case 'wikimedia':
-            map.addLayer(wikimediaLayer);
-            break;
         default:
             map.addLayer(osmLayer); // Fallback
             break;
     }
     // S'assurer que la couche vectorielle de marqueurs est toujours au-dessus
-    // Il est important de la rajouter après avoir retiré et rajouté les fonds de carte
     map.removeLayer(vectorLayer); 
     map.addLayer(vectorLayer);
 }
@@ -233,7 +231,8 @@ function displayMarkersAndList(locationsToDisplay) {
 // Fonction pour ouvrir Google Maps en vue satellite
 // Rendre cette fonction globale pour qu'elle puisse être appelée depuis le HTML du popup
 window.openGoogleMaps = function(lat, lng) {
-    var googleMapsUrl = `https://www.google.com/maps/@${lat},${lng},17z/data=!3m1!1e3?hl=fr`; // Vue satellite et zoom plus proche
+    // Utilisation de l'URL Google Maps avec des paramètres pour la vue satellite et un zoom pertinent
+    var googleMapsUrl = `https://www.google.com/maps/@?api=1&map_action=map&center=${lat},${lng}&zoom=17&basemap=satellite`; 
     window.open(googleMapsUrl, '_blank');
 };
 
