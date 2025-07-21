@@ -51,23 +51,23 @@ popupCloser.onclick = function() {
 };
 
 
-// Définition des fonds de carte avec des URLs fiables
+// Définition des fonds de carte avec des URLs fiables et Open-Source
 const osmLayer = new ol.layer.Tile({
     source: new ol.source.OSM(),
     properties: { name: 'osm' }
 });
 
-// Satellite (Esri World Imagery) - Très fiable
-const esriSatelliteLayer = new ol.layer.Tile({
+// Satellite (OpenStreetMap avec tuiles ESRI World Imagery - très fiable)
+const satelliteLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
-        attributions: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        attributions: 'Tiles © <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">Esri</a>',
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         maxZoom: 19
     }),
-    properties: { name: 'esri-satellite' }
+    properties: { name: 'satellite' }
 });
 
-// Terrain (OpenTopoMap) - Excellent pour le relief et les détails topographiques
+// Terrain (OpenTopoMap) - Excellent pour le relief
 const openTopoMapLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
         attributions: 'Map data: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: © <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
@@ -77,7 +77,17 @@ const openTopoMapLayer = new ol.layer.Tile({
     properties: { name: 'opentopomap-terrain' }
 });
 
-// Foncé (CartoDB Dark Matter) - Stable
+// CartoDB Light (Rues claires) - Très fiable
+const cartoLightLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+        maxZoom: 19
+    }),
+    properties: { name: 'carto-light' }
+});
+
+// CartoDB Dark (Foncé) - Très fiable
 const cartoDarkLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
         attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -85,16 +95,6 @@ const cartoDarkLayer = new ol.layer.Tile({
         maxZoom: 19
     }),
     properties: { name: 'carto-dark' }
-});
-
-// Rues (CartoDB Positron) - Vue claire de rues
-const cartoPositronLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        maxZoom: 19
-    }),
-    properties: { name: 'carto-positron' }
 });
 
 
@@ -105,7 +105,7 @@ var map = new ol.Map({
         osmLayer // Fond de carte par défaut
     ],
     view: new ol.View({
-        center: ol.proj.fromLonLat([2.3522, 48.8566]), // Paris
+        center: ol.proj.fromLonLat([2.3522, 48.8566]), // Coordonnées initiales (Paris)
         zoom: 6
     }),
     overlays: [popupOverlay] // Ajoute le popup comme overlay
@@ -133,17 +133,17 @@ function changeOpenLayersBasemap(style) {
         case 'osm':
             map.addLayer(osmLayer);
             break;
-        case 'esri-satellite':
-            map.addLayer(esriSatelliteLayer);
+        case 'satellite':
+            map.addLayer(satelliteLayer);
             break;
         case 'opentopomap-terrain':
             map.addLayer(openTopoMapLayer);
             break;
+        case 'carto-light':
+            map.addLayer(cartoLightLayer);
+            break;
         case 'carto-dark':
             map.addLayer(cartoDarkLayer);
-            break;
-        case 'carto-positron':
-            map.addLayer(cartoPositronLayer);
             break;
         default:
             map.addLayer(osmLayer); // Fallback
@@ -233,7 +233,7 @@ function displayMarkersAndList(locationsToDisplay) {
 // Rendre cette fonction globale pour qu'elle puisse être appelée depuis le HTML du popup
 window.openGoogleMaps = function(lat, lng) {
     // Utilisation de l'URL Google Maps avec des paramètres pour la vue satellite et un zoom pertinent
-    var googleMapsUrl = `https://www.google.com/maps/@?api=1&map_action=map&center=${lat},${lng}&zoom=17&basemap=satellite`; 
+    var googleMapsUrl = `https://www.google.com/maps/@${lat},${lng},17z/data=!3m1!1e3?hl=fr`; 
     window.open(googleMapsUrl, '_blank');
 };
 
