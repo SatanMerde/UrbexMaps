@@ -10,6 +10,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 var allMarkers = [];
 // Variable pour stocker tous les lieux (données brutes)
 var allLocations = [];
+// Référence à l'élément UL de la liste des résultats
+var resultsList = document.getElementById('results-list');
 
 // Charger les lieux depuis le fichier JSON
 fetch('data/locations.json')
@@ -21,19 +23,25 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        displayMarkers(allLocations); // Afficher tous les marqueurs au démarrage
+        displayMarkersAndList(allLocations); // Afficher tous les marqueurs et la liste au démarrage
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
-// Fonction pour afficher les marqueurs sur la carte
-function displayMarkers(locationsToDisplay) {
-    // Supprimer tous les marqueurs existants avant d'en ajouter de nouveaux
+// Fonction pour afficher les marqueurs sur la carte ET mettre à jour la liste des résultats
+function displayMarkersAndList(locationsToDisplay) {
+    // 1. Supprimer tous les marqueurs existants
     allMarkers.forEach(marker => map.removeLayer(marker));
     allMarkers = []; // Réinitialiser la liste des marqueurs
 
+    // 2. Vider la liste des résultats HTML
+    resultsList.innerHTML = '';
+
+    // 3. Ajouter les nouveaux marqueurs et les éléments à la liste
     locationsToDisplay.forEach(location => {
+        // Création du marqueur
         var marker = L.marker([location.lat, location.lng]).addTo(map);
 
+        // Contenu du popup
         var popupContent = `
             <h3>${location.name}</h3>
             <p>${location.description}</p>
@@ -42,6 +50,28 @@ function displayMarkers(locationsToDisplay) {
         `;
         marker.bindPopup(popupContent);
         allMarkers.push(marker); // Ajouter le marqueur à notre liste
+
+        // Création de l'élément de liste
+        var listItem = document.createElement('li');
+        listItem.className = 'result-item';
+        listItem.innerHTML = `
+            <h3>${location.name}</h3>
+            <p>${location.description}</p>
+        `;
+        listItem.dataset.markerId = allMarkers.indexOf(marker); // Associe l'élément de liste au marqueur
+
+        // Ajouter un écouteur d'événement pour le clic sur l'élément de liste
+        listItem.addEventListener('click', function() {
+            var markerIndex = parseInt(this.dataset.markerId);
+            var targetMarker = allMarkers[markerIndex];
+
+            if (targetMarker) {
+                map.flyTo(targetMarker.getLatLng(), 15); // Centre la carte sur le marqueur avec un zoom plus proche
+                targetMarker.openPopup(); // Ouvre le popup du marqueur
+            }
+        });
+
+        resultsList.appendChild(listItem); // Ajouter l'élément à la liste HTML
     });
 }
 
@@ -63,5 +93,5 @@ searchInput.addEventListener('keyup', function() {
                location.description.toLowerCase().includes(searchTerm);
     });
 
-    displayMarkers(filteredLocations); // Afficher uniquement les marqueurs filtrés
+    displayMarkersAndList(filteredLocations); // Afficher uniquement les marqueurs filtrés et la liste
 });
