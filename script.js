@@ -1,17 +1,4 @@
-// Importations nécessaires depuis OpenLayers
-import Map from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/Map.js';
-import View from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/View.js';
-import TileLayer from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/layer/Tile.js';
-import OSM from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/source/OSM.js';
-import {fromLonLat, toLonLat} from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/proj.js';
-import Feature from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/Feature.js';
-import Point from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/geom/Point.js';
-import {Icon, Style} from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/style.js';
-import VectorLayer from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/layer/Vector.js';
-import VectorSource from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/source/Vector.js';
-import Overlay from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/Overlay.js';
-import XYZ from 'https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol/source/XYZ.js';
-
+// OpenLayers est importé globalement via le script dans index.html (pas besoin d'imports individuels ici)
 
 // Variables pour les éléments du DOM
 var resultsList = document.getElementById('results-list');
@@ -22,11 +9,11 @@ var mapContainer = document.getElementById('map');
 
 // Données des lieux
 var allLocations = [];
-var vectorSource = new VectorSource(); // Source pour les marqueurs OpenLayers
-var vectorLayer = new VectorLayer({
+var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
+var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
-    style: new Style({
-        image: new Icon({
+    style: new ol.style.Style({
+        image: new ol.style.Icon({
             anchor: [0.5, 1],
             src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut
             // Ou une icône personnalisée : 'data/marker-icon.png' si tu en mets une
@@ -48,7 +35,7 @@ var popupContent = document.createElement('div');
 popupContainer.appendChild(popupContent);
 
 // Création de l'Overlay pour le popup
-var popupOverlay = new Overlay({
+var popupOverlay = new ol.Overlay({
     element: popupContainer,
     autoPan: {
         animation: {
@@ -65,15 +52,15 @@ popupCloser.onclick = function() {
 
 
 // Définition des fonds de carte
-const osmLayer = new TileLayer({
-    source: new OSM(),
+const osmLayer = new ol.layer.Tile({
+    source: new ol.source.OSM(),
     properties: { name: 'osm' }
 });
 
 // Esri World Imagery (Satellite) - URL de tuiles XYZ
-const esriSatelliteLayer = new TileLayer({
-    source: new XYZ({
-        attributions: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+const esriSatelliteLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         maxZoom: 19
     }),
@@ -81,9 +68,9 @@ const esriSatelliteLayer = new TileLayer({
 });
 
 // Esri World Topo Map (Terrain)
-const esriTerrainLayer = new TileLayer({
-    source: new XYZ({
-        attributions: 'Tiles &copy; Esri &mdash; Esri, DeLorme, HERE, TomTom, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+const esriTerrainLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: 'Tiles © Esri — Esri, DeLorme, HERE, TomTom, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
         maxZoom: 19
     }),
@@ -91,8 +78,8 @@ const esriTerrainLayer = new TileLayer({
 });
 
 // CartoDB Dark Matter (Foncé)
-const cartoDarkLayer = new TileLayer({
-    source: new XYZ({
+const cartoDarkLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
         attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         url: 'https://{a-d}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
         maxZoom: 19
@@ -101,8 +88,8 @@ const cartoDarkLayer = new TileLayer({
 });
 
 // Wikimedia (Rues détaillées)
-const wikimediaLayer = new TileLayer({
-    source: new XYZ({
+const wikimediaLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
         attributions: '© <a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png',
         maxZoom: 19
@@ -112,13 +99,13 @@ const wikimediaLayer = new TileLayer({
 
 
 // Initialisation de la carte OpenLayers
-var map = new Map({
+var map = new ol.Map({
     target: 'map',
     layers: [
         osmLayer // Fond de carte par défaut
     ],
-    view: new View({
-        center: fromLonLat([2.3522, 48.8566]), // Paris
+    view: new ol.View({
+        center: ol.proj.fromLonLat([2.3522, 48.8566]), // Paris
         zoom: 6
     }),
     overlays: [popupOverlay] // Ajoute le popup comme overlay
@@ -134,7 +121,9 @@ map.addLayer(vectorLayer);
 function changeOpenLayersBasemap(style) {
     // Supprimer toutes les couches de fond de carte existantes
     map.getLayers().forEach(layer => {
-        if (layer.get('name') !== undefined) { // C'est une couche de fond de carte
+        // Vérifie si la couche a la propriété 'name' pour l'identifier comme une couche de fond de carte
+        // Et s'assure de ne pas retirer la couche de marqueurs (qui n'a pas de 'name' ici)
+        if (layer.get('name') !== undefined) { 
             map.removeLayer(layer);
         }
     });
@@ -161,7 +150,8 @@ function changeOpenLayersBasemap(style) {
             break;
     }
     // S'assurer que la couche vectorielle de marqueurs est toujours au-dessus
-    map.removeLayer(vectorLayer);
+    // Il est important de la rajouter après avoir retiré et rajouté les fonds de carte
+    map.removeLayer(vectorLayer); 
     map.addLayer(vectorLayer);
 }
 
@@ -196,8 +186,8 @@ function displayMarkersAndList(locationsToDisplay) {
 
     // Ajouter les nouveaux marqueurs OpenLayers et les éléments à la liste
     locationsToDisplay.forEach(location => {
-        var feature = new Feature({
-            geometry: new Point(fromLonLat([location.lng, location.lat])),
+        var feature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([location.lng, location.lat])),
             name: location.name,
             description: location.description,
             image: location.image
@@ -221,7 +211,7 @@ function displayMarkersAndList(locationsToDisplay) {
             
             // Centrer la carte sur le marqueur
             map.getView().animate({
-                center: fromLonLat([lon, lat]),
+                center: ol.proj.fromLonLat([lon, lat]),
                 zoom: 15,
                 duration: 500
             });
@@ -233,7 +223,7 @@ function displayMarkersAndList(locationsToDisplay) {
                 ${location.image ? `<img src="${location.image}" alt="${location.name}">` : ''}
                 <button onclick="openGoogleMaps(${location.lat}, ${location.lng})">Voir sur Google Maps (Satellite)</button>
             `;
-            popupOverlay.setPosition(fromLonLat([lon, lat]));
+            popupOverlay.setPosition(ol.proj.fromLonLat([lon, lat]));
         });
 
         resultsList.appendChild(listItem); // Ajouter l'élément à la liste HTML
@@ -269,7 +259,7 @@ searchInput.addEventListener('keyup', function() {
     displayMarkersAndList(filteredLocations);
 });
 
-// Écouteur pour le sélecteur de style de carte
+// Écouteur de clic sur le sélecteur de style de carte
 mapStyleSelector.addEventListener('change', function() {
     var selectedValue = this.value;
     changeOpenLayersBasemap(selectedValue);
@@ -288,7 +278,7 @@ map.on('click', function(evt) {
             <h3>${props.name}</h3>
             <p>${props.description}</p>
             ${props.image ? `<img src="${props.image}" alt="${props.name}">` : ''}
-            <button onclick="openGoogleMaps(${toLonLat(coordinates)[1]}, ${toLonLat(coordinates)[0]})">Voir sur Google Maps (Satellite)</button>
+            <button onclick="openGoogleMaps(${ol.proj.toLonLat(coordinates)[1]}, ${ol.proj.toLonLat(coordinates)[0]})">Voir sur Google Maps (Satellite)</button>
         `;
         popupOverlay.setPosition(coordinates);
     } else {
