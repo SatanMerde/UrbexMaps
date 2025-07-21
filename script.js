@@ -1,22 +1,30 @@
-// OpenLayers est importé globalement via le script dans index.html (pas besoin d'imports individuels ici)
+// OpenLayers est importé globalement via le script dans index.html
 
 // Variables pour les éléments du DOM
 var resultsList = document.getElementById('results-list');
 var resultsSidebar = document.getElementById('results-sidebar');
 var searchInput = document.getElementById('search-input');
-var mapContainer = document.getElementById('map'); // Assure-toi que cet élément existe bien dans index.html (<div id="map">)
+var mapContainer = document.getElementById('map');
 
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
+
+// Définition de l'icône du marqueur
+var markerIconStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+        anchor: [0.5, 1], // Point d'ancrage de l'icône (centre en bas)
+        src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png', // Icône par défaut d'OpenLayers (tu peux la changer)
+        // EXEMPLES D'AUTRES ICONES :
+        // 'https://docs.mapbox.com/help/glossary/mapbox-logo.png' // Exemple d'icône Mapbox
+        // OU si tu as ton icône dans un dossier 'data/' : 'data/marker-urbex.png'
+        scale: 1 // Ajuste la taille de l'icône si nécessaire (ex: 0.7 pour plus petit)
+    })
+});
+
 var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
 var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
-    style: new ol.style.Style({
-        image: new ol.style.Icon({
-            anchor: [0.5, 1],
-            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut
-        })
-    })
+    style: markerIconStyle // Applique le style d'icône défini ci-dessus
 });
 
 // Création du conteneur popup
@@ -57,7 +65,7 @@ const osmLayer = new ol.layer.Tile({
 
 // Initialisation de la carte OpenLayers
 var map = new ol.Map({
-    target: 'map', // C'est ici que la carte est attachée à l'élément div#map
+    target: 'map',
     layers: [
         osmLayer // Uniquement le fond de carte OpenStreetMap de base
     ],
@@ -78,7 +86,6 @@ map.addLayer(vectorLayer);
 fetch('data/locations.json')
     .then(response => {
         if (!response.ok) {
-            // Si le fichier JSON n'est pas trouvé ou il y a une erreur réseau
             console.error('Erreur de chargement du fichier JSON:', response.status, response.statusText);
             throw new Error('Impossible de charger le fichier data/locations.json. Vérifiez son chemin et son contenu.');
         }
@@ -86,7 +93,8 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        displayMarkersAndList(allLocations); // Affiche TOUS les marqueurs au démarrage
+        // Ne pas afficher tous les marqueurs au démarrage si la recherche est vide
+        // Ils seront affichés si l'utilisateur efface la recherche.
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
@@ -100,9 +108,9 @@ function displayMarkersAndList(locationsToDisplay) {
 
     // Gérer la visibilité de la sidebar
     if (locationsToDisplay.length > 0) {
-        resultsSidebar.style.display = 'block';
+        resultsSidebar.style.display = 'block'; // Afficher la sidebar s'il y a des résultats
     } else {
-        resultsSidebar.style.display = 'none';
+        resultsSidebar.style.display = 'none'; // Masquer la sidebar s'il n'y a pas de résultats
     }
 
     // Ajouter les nouveaux marqueurs OpenLayers et les éléments à la liste
@@ -153,8 +161,6 @@ function displayMarkersAndList(locationsToDisplay) {
 
 // Fonction pour ouvrir Google Maps en vue satellite
 window.openGoogleMaps = function(lat, lng) {
-    // Note: Cette URL Google Maps est une astuce non officielle et peut ne pas être stable.
-    // Pour une intégration officielle et robuste, une clé API Google Maps est nécessaire.
     var googleMapsUrl = `https://www.google.com/maps/@${lat},${lng},17z/data=!3m1!1e3?hl=fr`; 
     window.open(googleMapsUrl, '_blank');
 };
@@ -167,7 +173,9 @@ searchInput.addEventListener('keyup', function() {
     var searchTerm = searchInput.value.toLowerCase();
 
     if (searchTerm === '') {
-        displayMarkersAndList(allLocations); // Affiche TOUS les marqueurs si la recherche est vide
+        // Si la recherche est vide, ne pas afficher de marqueurs ni de résultats
+        vectorSource.clear(); // Supprime tous les marqueurs de la carte
+        resultsSidebar.style.display = 'none'; // Masque la sidebar
         popupOverlay.setPosition(undefined); // Cacher le popup
         return;
     }
@@ -207,5 +215,5 @@ map.on('click', function(evt) {
 
 // Masquer la sidebar au chargement initial
 document.addEventListener('DOMContentLoaded', (event) => {
-    resultsSidebar.style.display = 'none';
+    resultsSidebar.style.display = 'none'; // S'assurer que la sidebar est cachée au démarrage
 });
