@@ -15,15 +15,15 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Police moderne */
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+    display: flex; /* Utilise flexbox pour la mise en page principale */
+    flex-direction: column; /* Empile les éléments verticalement */
+    height: 100vh; /* Prend toute la hauteur de la fenêtre */
     background-color: var(--background-light); /* Couleur de fond générale */
     color: var(--text-color-dark);
     overflow: hidden; /* Empêche le défilement global non désiré */
 }
 
-/* Conteneur principal pour la barre de recherche */
+/* Conteneur principal pour la barre de recherche et le sélecteur de style */
 #search-container {
     position: relative;
     padding: 15px;
@@ -32,12 +32,17 @@ body {
     text-align: center;
     box-shadow: var(--shadow-light);
     z-index: 1000;
+    display: flex; /* Utilise flexbox pour aligner les éléments */
+    justify-content: center; /* Centre les éléments */
+    align-items: center; /* Aligne verticalement */
+    gap: 15px; /* Espace entre les éléments */
+    flex-wrap: wrap; /* Permet le retour à la ligne sur petits écrans */
 }
 
 #search-input {
     width: 80%;
-    max-width: 450px; /* Légèrement plus large */
-    padding: 12px 15px; /* Plus de padding */
+    max-width: 350px; /* Légèrement plus étroit pour laisser de la place au sélecteur */
+    padding: 12px 15px;
     border: 1px solid var(--border-color);
     border-radius: 8px; /* Bords plus arrondis */
     font-size: 17px;
@@ -51,29 +56,67 @@ body {
     outline: none; /* Supprime l'outline par défaut du navigateur */
 }
 
+#map-style-selector {
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-dark);
+    font-size: 16px;
+    color: var(--text-color-dark);
+    cursor: pointer;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#map-style-selector:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    outline: none;
+}
+
+
 /* Conteneur principal pour la sidebar et la carte */
 #main-content {
     display: flex;
     flex-grow: 1;
+    position: relative; 
 }
 
 /* Styles de la barre latérale des résultats */
 #results-sidebar {
-    width: 350px; /* Légèrement plus large */
+    width: 350px;
     background-color: var(--background-dark);
     padding: 20px;
     box-shadow: var(--shadow-light);
     overflow-y: auto;
     flex-shrink: 0;
-    transition: width 0.3s ease; /* Transition pour une éventuelle adaptation de largeur */
-    display: none; /* Masqué par défaut */
+    transition: width 0.3s ease, transform 0.3s ease;
+    display: none; /* Masqué par défaut (sera géré par JS) */
+    /* Styles pour la barre de défilement */
+    scrollbar-width: thin; /* Pour Firefox */
+    scrollbar-color: var(--primary-color) #f1f1f1; /* Pour Firefox */
 }
+#results-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+#results-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+#results-sidebar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+#results-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #388E3C;
+}
+
 
 #results-sidebar h2 {
     margin-top: 0;
-    color: var(--primary-color); /* Couleur du titre de la sidebar */
+    color: var(--primary-color);
     font-size: 1.4em;
-    border-bottom: 2px solid var(--primary-color); /* Ligne plus prononcée */
+    border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
     margin-bottom: 20px;
     text-align: center;
@@ -98,40 +141,100 @@ body {
 
 .result-item:hover {
     background-color: var(--background-light);
-    transform: translateY(-2px); /* Petit effet de soulèvement au survol */
+    transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
 }
 
 .result-item h3 {
     margin: 0 0 8px 0;
     font-size: 1.2em;
-    color: var(--secondary-color); /* Nouvelle couleur pour le titre du lieu */
+    color: var(--secondary-color);
 }
 
 .result-item p {
     margin: 0;
     font-size: 0.95em;
     color: var(--text-color-light);
-    white-space: normal; /* Autorise le retour à la ligne pour la description */
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 3.8em; /* Limite la description à environ 3 lignes */
+    max-height: 3.8em;
     line-height: 1.3em;
 }
 
-/* Styles de la carte */
+/* Styles de la carte OpenLayers */
 #map {
     flex-grow: 1;
     height: 100%;
-    border-radius: 8px; /* Bords légèrement arrondis pour la carte */
-    overflow: hidden; /* Important pour que le border-radius fonctionne */
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-/* Styles pour les popups Leaflet */
-.leaflet-popup-content p { margin: 0; }
-.leaflet-popup-content button {
+/* Styles pour les popups OpenLayers (ol-popup) */
+.ol-popup {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 250px;
+}
+.ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+}
+.ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+}
+.ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #666;
+}
+.ol-popup-closer:after {
+    content: "✖";
+}
+
+.ol-popup h3 {
+    margin: 0 0 8px 0;
+    color: var(--secondary-color);
+    font-size: 1.2em;
+}
+.ol-popup p {
+    margin: 0;
+    font-size: 0.95em;
+    color: var(--text-color-light);
+}
+.ol-popup img {
+    max-width: 150px; 
+    height: auto; 
+    display: block; 
+    margin: 10px auto 0; /* Centre l'image et ajoute de l'espace */
+}
+.ol-popup button {
     display: block;
-    margin-top: 15px; /* Plus d'espace */
+    margin: 15px auto 0; /* Centre le bouton */
     padding: 10px 15px;
     background-color: var(--primary-color);
     color: white;
@@ -141,12 +244,23 @@ body {
     font-size: 0.95em;
     transition: background-color 0.3s ease;
 }
-.leaflet-popup-content button:hover {
-    background-color: #388E3C; /* Vert plus foncé au survol */
+.ol-popup button:hover {
+    background-color: #388E3C;
 }
 
 /* Media Queries pour les petits écrans (smartphones) */
 @media (max-width: 768px) {
+    #search-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    #search-input {
+        max-width: none; /* Pas de max-width sur mobile */
+    }
+    #map-style-selector {
+        width: 90%; /* Prend plus de place sur mobile */
+    }
+
     body {
         flex-direction: column;
     }
@@ -155,20 +269,13 @@ body {
     }
     #results-sidebar {
         width: auto;
-        height: 30vh; /* Hauteur relative pour la sidebar sur mobile */
+        height: 30vh;
         flex-shrink: 1;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         border-bottom: 1px solid var(--border-color);
-        padding: 15px; /* Ajustement du padding */
+        padding: 15px;
     }
-    #map {
-        height: calc(100vh - 30vh - 70px); /* Hauteur de l'écran - hauteur sidebar - hauteur barre recherche (environ 70px) */
-    }
-    #search-container {
-        padding: 12px;
-    }
-    #search-input {
-        width: 90%;
-        padding: 10px;
+    #map { /* Applique les mêmes styles aux deux vues */
+        height: calc(100vh - 30vh - 90px); /* Hauteur de l'écran - hauteur sidebar - hauteur barre recherche */
     }
 }
