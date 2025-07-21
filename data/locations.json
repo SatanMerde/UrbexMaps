@@ -1,0 +1,42 @@
+[
+    {
+        "id": "1",
+        "name": "Ancien Hôpital Abandonné",
+        "lat": 48.8566,
+        "lng": 2.3522,
+        "description": "Un grand complexe hospitalier désaffecté avec une histoire fascinante en plein Paris.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Ancien_Hopital_Saint_Vincent_de_Paul_-_Paris_14e.jpg/640px-Ancien_Hopital_Saint_Vincent_de_Paul_-_Paris_14e.jpg"
+    },
+    {
+        "id": "2",
+        "name": "Usine de Textile en Ruine",
+        "lat": 45.764,
+        "lng": 4.8357,
+        "description": "Immense usine industrielle près de Lyon, vestiges de l'ère de la révolution industrielle.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Abandoned_textile_factory_in_Viseu%2C_Portugal.jpg/640px-Abandoned_textile_factory_in_Viseu%2C_Portugal.jpg"
+    },
+    {
+        "id": "3",
+        "name": "Château des Brumes",
+        "lat": 47.5684,
+        "lng": 6.8392,
+        "description": "Un majestueux château du 18ème siècle, abandonné depuis des décennies dans l'est de la France.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Chateau_de_Rix_vue_aerienne.jpg/640px-Chateau_de_Rix_vue_aerienne.jpg"
+    },
+    {
+        "id": "4",
+        "name": "Église Oubliée",
+        "lat": 50.8503,
+        "lng": 4.3517,
+        "description": "Une église isolée, magnifique malgré les ravages du temps.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Abandonned_church_%28Belgium%29.jpg/640px-Abandonned_church_%28Belgium%29.jpg"
+    },
+    {
+        "id": "5",
+        "name": "Ancienne Mine de Charbon",
+        "lat": 49.5936,
+        "lng": 2.8533,
+        "description": "Vestiges impressionnants d'une mine de charbon du nord de la France.",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Nord-Pas-de-Calais_Mining_Basin_-_Coke_oven_Batteries_of_the_former_Dourges_Colliery_no_8_and_8bis_at_Oignies_-_20140702.jpg/640px-Nord-Pas-de-Calais_Mining_Basin_-_Coke_oven_Batteries_of_the_former_Dourges_Colliery_no_8_and_8bis_at_Oignies_-_20140702.jpg"
+    }
+]
