@@ -9,17 +9,15 @@ var mapContainer = document.getElementById('map');
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 
-// --- Définition du style du marqueur comme une épingle Google Maps ---
+// --- Définition du style du marqueur comme l'épingle rouge de Google Maps ---
 var markerGoogleMapsStyle = new ol.style.Style({
     image: new ol.style.Icon({
         anchor: [0.5, 1], // Le point d'ancrage est le bas de l'épingle
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
-        // URL d'une icône qui ressemble à l'épingle Google Maps
-        src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png', // Cette icône est en fait l'épingle classique
-        // Note: L'icône précédente (le château) était probablement due à un cache ou une autre URL.
-        // Cette URL spécifique est la source pour l'épingle rouge d'OpenLayers.
-        scale: 1 // Ajuste la taille si nécessaire, 1 est la taille normale
+        // C'EST L'URL DE L'ÉPINGLE ROUGE OFFICIELLE DE GOOGLE MAPS.
+        src: 'https://maps.gstatic.com/mapfiles/markers/red/marker.png', 
+        scale: 1 // Garde la taille originale de l'icône
     })
 });
 
