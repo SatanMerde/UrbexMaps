@@ -1,125 +1,54 @@
-/* Variables CSS pour les couleurs, faciles à modifier */
-:root {
-    --primary-color: #4CAF50; /* Vert moderne */
-    --secondary-color: #3f51b5; /* Bleu foncé */
-    --background-light: #f5f7fa; /* Gris clair */
-    --background-dark: #ffffff; /* Blanc pour les cartes/éléments */
-    --text-color-dark: #333333; /* Texte foncé */
-    --text-color-light: #666666; /* Texte gris */
-    --border-color: #e0e0e0; /* Bordures claires */
-    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); /* Ombre douce */
-    --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.15); /* Ombre plus prononcée au survol */
-}
-
+/* Styles généraux du corps de la page */
 body {
     margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Police moderne */
-    display: flex; /* Utilise flexbox pour la mise en page principale */
-    flex-direction: column; /* Empile les éléments verticalement */
-    height: 100vh; /* Prend toute la hauteur de la fenêtre */
-    background-color: var(--background-light); /* Couleur de fond générale */
-    color: var(--text-color-dark);
-    overflow: hidden; /* Empêche le défilement global non désiré */
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* La hauteur de la vue du navigateur */
+    overflow: hidden; /* Empêche le défilement global de la page */
 }
 
-/* Conteneur principal pour la barre de recherche et le sélecteur de style */
+/* Conteneur de la barre de recherche */
 #search-container {
-    position: relative;
-    padding: 15px;
-    background-color: var(--background-dark);
-    border-bottom: 1px solid var(--border-color);
-    text-align: center;
-    box-shadow: var(--shadow-light);
-    z-index: 1000;
-    display: flex; /* Utilise flexbox pour aligner les éléments */
-    justify-content: center; /* Centre les éléments */
-    align-items: center; /* Aligne verticalement */
-    gap: 15px; /* Espace entre les éléments */
-    flex-wrap: wrap; /* Permet le retour à la ligne sur petits écrans */
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 10px; /* Espace entre les éléments */
+    align-items: center;
 }
 
 #search-input {
-    width: 80%;
-    max-width: 350px; /* Légèrement plus étroit pour laisser de la place au sélecteur */
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px; /* Bords plus arrondis */
-    font-size: 17px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Petite ombre interne */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-#search-input:focus {
-    border-color: var(--primary-color); /* Bordure colorée au focus */
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); /* Ombre de focus subtile */
-    outline: none; /* Supprime l'outline par défaut du navigateur */
-}
-
-#map-style-selector {
-    padding: 10px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--background-dark);
+    flex-grow: 1; /* Prend l'espace disponible */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     font-size: 16px;
-    color: var(--text-color-dark);
-    cursor: pointer;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#map-style-selector:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-    outline: none;
-}
-
-
-/* Conteneur principal pour la sidebar et la carte */
+/* Contenu principal (sidebar + carte) */
 #main-content {
     display: flex;
-    flex-grow: 1;
-    position: relative; 
+    flex-grow: 1; /* Prend l'espace restant verticalement */
 }
 
-/* Styles de la barre latérale des résultats */
+/* Sidebar des résultats */
 #results-sidebar {
-    width: 350px;
-    background-color: var(--background-dark);
-    padding: 20px;
-    box-shadow: var(--shadow-light);
-    overflow-y: auto;
-    flex-shrink: 0;
-    transition: width 0.3s ease, transform 0.3s ease;
-    display: none; /* Masqué par défaut (sera géré par JS) */
-    /* Styles pour la barre de défilement */
-    scrollbar-width: thin; /* Pour Firefox */
-    scrollbar-color: var(--primary-color) #f1f1f1; /* Pour Firefox */
+    width: 300px; /* Largeur de la barre latérale */
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto; /* Permet le défilement si les résultats sont nombreux */
+    display: none; /* Cacher par défaut, JavaScript la rendra visible si nécessaire */
+    flex-shrink: 0; /* Empêche la sidebar de rétrécir */
 }
-#results-sidebar::-webkit-scrollbar {
-    width: 8px;
-}
-#results-sidebar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-#results-sidebar::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}
-#results-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #388E3C;
-}
-
 
 #results-sidebar h2 {
     margin-top: 0;
-    color: var(--primary-color);
-    font-size: 1.4em;
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    text-align: center;
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 15px;
 }
 
 #results-list {
@@ -129,48 +58,39 @@ body {
 }
 
 .result-item {
-    background-color: var(--background-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 12px;
-    padding: 15px;
-    cursor: pointer;
-    box-shadow: var(--shadow-light);
-    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer; /* Indique que l'élément est cliquable */
+    transition: background-color 0.2s ease;
 }
 
 .result-item:hover {
-    background-color: var(--background-light);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    background-color: #e9e9e9;
 }
 
 .result-item h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.2em;
-    color: var(--secondary-color);
+    margin: 0 0 5px 0;
+    color: #007bff; /* Couleur bleue pour les titres de lieu */
+    font-size: 18px;
 }
 
 .result-item p {
     margin: 0;
-    font-size: 0.95em;
-    color: var(--text-color-light);
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 3.8em;
-    line-height: 1.3em;
+    color: #555;
+    font-size: 14px;
 }
 
-/* Styles de la carte OpenLayers */
+/* Conteneur de la carte OpenLayers */
 #map {
-    flex-grow: 1;
-    height: 100%;
-    border-radius: 8px;
-    overflow: hidden;
+    flex-grow: 1; /* Prend tout l'espace restant horizontalement */
+    height: 100%; /* S'assure que la carte remplit son conteneur parent */
+    background: #e0e0e0; /* Couleur de fond si la carte ne charge pas */
 }
 
-/* Styles pour les popups OpenLayers (ol-popup) */
+/* Styles pour le popup OpenLayers */
 .ol-popup {
     position: absolute;
     background-color: white;
@@ -178,10 +98,12 @@ body {
     padding: 15px;
     border-radius: 10px;
     border: 1px solid #cccccc;
-    bottom: 12px;
-    left: -50px;
+    bottom: 12px; /* Positionne au-dessus du marqueur */
+    left: -50px; /* Centre le popup par rapport au marqueur */
     min-width: 250px;
+    z-index: 1000; /* Assure que le popup est au-dessus des autres éléments */
 }
+
 .ol-popup:after, .ol-popup:before {
     top: 100%;
     border: solid transparent;
@@ -191,91 +113,85 @@ body {
     position: absolute;
     pointer-events: none;
 }
+
 .ol-popup:after {
     border-top-color: white;
     border-width: 10px;
     left: 48px;
     margin-left: -10px;
 }
+
 .ol-popup:before {
     border-top-color: #cccccc;
     border-width: 11px;
     left: 48px;
     margin-left: -11px;
 }
+
 .ol-popup-closer {
     text-decoration: none;
     position: absolute;
     top: 2px;
     right: 8px;
-    cursor: pointer;
-    font-size: 1.2em;
-    color: #666;
+    color: #333;
+    font-size: 20px;
 }
-.ol-popup-closer:after {
-    content: "✖";
+
+.ol-popup-closer:hover {
+    color: #000;
 }
 
 .ol-popup h3 {
-    margin: 0 0 8px 0;
-    color: var(--secondary-color);
-    font-size: 1.2em;
+    margin-top: 0;
+    font-size: 18px;
+    color: #007bff;
 }
+
 .ol-popup p {
-    margin: 0;
-    font-size: 0.95em;
-    color: var(--text-color-light);
+    font-size: 14px;
+    color: #555;
 }
+
 .ol-popup img {
-    max-width: 150px; 
-    height: auto; 
-    display: block; 
-    margin: 10px auto 0; /* Centre l'image et ajoute de l'espace */
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 4px;
 }
+
 .ol-popup button {
     display: block;
-    margin: 15px auto 0; /* Centre le bouton */
-    padding: 10px 15px;
-    background-color: var(--primary-color);
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    background-color: #28a745; /* Vert pour le bouton Google Maps */
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.95em;
-    transition: background-color 0.3s ease;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
 }
+
 .ol-popup button:hover {
-    background-color: #388E3C;
+    background-color: #218838;
 }
 
 /* Media Queries pour les petits écrans (smartphones) */
 @media (max-width: 768px) {
-    #search-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-    #search-input {
-        max-width: none; /* Pas de max-width sur mobile */
-    }
-    #map-style-selector {
-        width: 90%; /* Prend plus de place sur mobile */
+    #main-content {
+        flex-direction: column; /* La sidebar passe au-dessus de la carte */
     }
 
-    body {
-        flex-direction: column;
-    }
-    #main-content {
-        flex-direction: column;
-    }
     #results-sidebar {
-        width: auto;
-        height: 30vh;
-        flex-shrink: 1;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border-bottom: 1px solid var(--border-color);
-        padding: 15px;
+        width: 100%; /* Prend toute la largeur */
+        height: 200px; /* Hauteur fixe pour la sidebar sur mobile */
+        border-right: none;
+        border-bottom: 1px solid #ddd;
     }
-    #map { /* Applique les mêmes styles aux deux vues */
-        height: calc(100vh - 30vh - 90px); /* Hauteur de l'écran - hauteur sidebar - hauteur barre recherche */
+
+    #map {
+        height: auto; /* La carte prend la hauteur restante */
+        min-height: 300px; /* Hauteur minimale pour la carte sur mobile */
     }
 }
