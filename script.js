@@ -4,7 +4,7 @@
 var resultsList = document.getElementById('results-list');
 var resultsSidebar = document.getElementById('results-sidebar');
 var searchInput = document.getElementById('search-input');
-var mapStyleSelector = document.getElementById('map-style-selector');
+// var mapStyleSelector = document.getElementById('map-style-selector'); // Désactivé car le sélecteur est retiré
 var mapContainer = document.getElementById('map');
 
 // Données des lieux
@@ -15,8 +15,7 @@ var vectorLayer = new ol.layer.Vector({
     style: new ol.style.Style({
         image: new ol.style.Icon({
             anchor: [0.5, 1],
-            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut OpenLayers
-            // Si tu veux utiliser une icône personnalisée, assure-toi qu'elle est dans 'data/marker-icon.png' : 'data/marker-icon.png'
+            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut
         })
     })
 });
@@ -24,7 +23,7 @@ var vectorLayer = new ol.layer.Vector({
 // Création du conteneur popup
 var popupContainer = document.createElement('div');
 popupContainer.className = 'ol-popup';
-document.body.appendChild(popupContainer); // Ajoute le popup au body pour le styliser plus facilement
+document.body.appendChild(popupContainer); 
 
 var popupCloser = document.createElement('a');
 popupCloser.href = '#';
@@ -51,58 +50,17 @@ popupCloser.onclick = function() {
 };
 
 
-// Définition des fonds de carte avec des URLs fiables et Open-Source
+// Définition du fond de carte OpenStreetMap de base
 const osmLayer = new ol.layer.Tile({
     source: new ol.source.OSM(),
-    properties: { name: 'osm' }
+    properties: { name: 'osm' } // Garde le nom pour la cohérence
 });
-
-// Satellite (OpenStreetMap avec tuiles ESRI World Imagery - très fiable)
-const satelliteLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: 'Tiles © <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">Esri</a>',
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        maxZoom: 19
-    }),
-    properties: { name: 'satellite' }
-});
-
-// Terrain (OpenTopoMap) - Excellent pour le relief
-const openTopoMapLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: 'Map data: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: © <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-        url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-        maxZoom: 17
-    }),
-    properties: { name: 'opentopomap-terrain' }
-});
-
-// CartoDB Light (Rues claires) - Très fiable
-const cartoLightLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        maxZoom: 19
-    }),
-    properties: { name: 'carto-light' }
-});
-
-// CartoDB Dark (Foncé) - Très fiable
-const cartoDarkLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        url: 'https://{a-d}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-        maxZoom: 19
-    }),
-    properties: { name: 'carto-dark' }
-});
-
 
 // Initialisation de la carte OpenLayers
 var map = new ol.Map({
     target: 'map',
     layers: [
-        osmLayer // Fond de carte par défaut
+        osmLayer // Uniquement le fond de carte OpenStreetMap de base
     ],
     view: new ol.View({
         center: ol.proj.fromLonLat([2.3522, 48.8566]), // Coordonnées initiales (Paris)
@@ -117,42 +75,8 @@ map.addLayer(vectorLayer);
 
 // --- Fonctions de gestion ---
 
-// Fonction pour changer le fond de carte OpenLayers
-function changeOpenLayersBasemap(style) {
-    // Supprimer toutes les couches de fond de carte existantes
-    map.getLayers().forEach(layer => {
-        // Vérifie si la couche a la propriété 'name' pour l'identifier comme une couche de fond de carte
-        // Et s'assure de ne pas retirer la couche de marqueurs (qui n'a pas de 'name' ici)
-        if (layer.get('name') !== undefined) { 
-            map.removeLayer(layer);
-        }
-    });
-
-    // Ajouter la nouvelle couche de fond de carte
-    switch (style) {
-        case 'osm':
-            map.addLayer(osmLayer);
-            break;
-        case 'satellite':
-            map.addLayer(satelliteLayer);
-            break;
-        case 'opentopomap-terrain':
-            map.addLayer(openTopoMapLayer);
-            break;
-        case 'carto-light':
-            map.addLayer(cartoLightLayer);
-            break;
-        case 'carto-dark':
-            map.addLayer(cartoDarkLayer);
-            break;
-        default:
-            map.addLayer(osmLayer); // Fallback
-            break;
-    }
-    // S'assurer que la couche vectorielle de marqueurs est toujours au-dessus
-    map.removeLayer(vectorLayer); 
-    map.addLayer(vectorLayer);
-}
+// Les fonctions de changement de fond de carte sont maintenant inutiles car il n'y a qu'une seule carte
+// et le sélecteur a été retiré.
 
 // Chargement des lieux depuis le fichier JSON
 fetch('data/locations.json')
@@ -259,11 +183,7 @@ searchInput.addEventListener('keyup', function() {
     displayMarkersAndList(filteredLocations);
 });
 
-// Écouteur de clic sur le sélecteur de style de carte
-mapStyleSelector.addEventListener('change', function() {
-    var selectedValue = this.value;
-    changeOpenLayersBasemap(selectedValue);
-});
+// L'écouteur pour le sélecteur de style de carte est retiré car le sélecteur est retiré
 
 // Écouteur de clic sur la carte pour les popups
 map.on('click', function(evt) {
