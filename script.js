@@ -9,15 +9,15 @@ var mapContainer = document.getElementById('map');
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 
-// --- Définition du style du marqueur comme un point de Google Maps ---
+// --- Définition du style du marqueur comme un point simple (comme Google Maps) ---
 var markerPointStyle = new ol.style.Style({
     image: new ol.style.Circle({
-        radius: 7, // Taille du cercle
+        radius: 7, // Taille du cercle en pixels
         fill: new ol.style.Fill({
-            color: 'rgba(255, 0, 0, 0.8)' // Couleur de remplissage (Rouge, semi-transparent)
+            color: 'rgba(255, 0, 0, 0.8)' // Couleur de remplissage (Rouge semi-transparent)
         }),
         stroke: new ol.style.Stroke({
-            color: 'white', // Contour blanc
+            color: 'white', // Couleur du contour
             width: 2 // Épaisseur du contour
         })
     })
@@ -26,7 +26,7 @@ var markerPointStyle = new ol.style.Style({
 var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
 var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
-    style: markerPointStyle // Applique le nouveau style de point
+    style: markerPointStyle // Applique le nouveau style de point simple
 });
 
 // Création du conteneur popup
