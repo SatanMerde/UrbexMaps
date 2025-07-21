@@ -4,7 +4,7 @@
 var resultsList = document.getElementById('results-list');
 var resultsSidebar = document.getElementById('results-sidebar');
 var searchInput = document.getElementById('search-input');
-var mapContainer = document.getElementById('map');
+var mapContainer = document.getElementById('map'); // Assure-toi que cet élément existe bien dans index.html (<div id="map">)
 
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
@@ -25,7 +25,7 @@ popupContainer.className = 'ol-popup';
 document.body.appendChild(popupContainer); 
 
 var popupCloser = document.createElement('a');
-popupCloper.href = '#';
+popupCloser.href = '#';
 popupCloser.className = 'ol-popup-closer';
 popupContainer.appendChild(popupCloser);
 
@@ -57,7 +57,7 @@ const osmLayer = new ol.layer.Tile({
 
 // Initialisation de la carte OpenLayers
 var map = new ol.Map({
-    target: 'map',
+    target: 'map', // C'est ici que la carte est attachée à l'élément div#map
     layers: [
         osmLayer // Uniquement le fond de carte OpenStreetMap de base
     ],
@@ -78,7 +78,9 @@ map.addLayer(vectorLayer);
 fetch('data/locations.json')
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erreur de chargement du fichier JSON: ' + response.statusText);
+            // Si le fichier JSON n'est pas trouvé ou il y a une erreur réseau
+            console.error('Erreur de chargement du fichier JSON:', response.status, response.statusText);
+            throw new Error('Impossible de charger le fichier data/locations.json. Vérifiez son chemin et son contenu.');
         }
         return response.json();
     })
@@ -151,6 +153,8 @@ function displayMarkersAndList(locationsToDisplay) {
 
 // Fonction pour ouvrir Google Maps en vue satellite
 window.openGoogleMaps = function(lat, lng) {
+    // Note: Cette URL Google Maps est une astuce non officielle et peut ne pas être stable.
+    // Pour une intégration officielle et robuste, une clé API Google Maps est nécessaire.
     var googleMapsUrl = `https://www.google.com/maps/@${lat},${lng},17z/data=!3m1!1e3?hl=fr`; 
     window.open(googleMapsUrl, '_blank');
 };
@@ -177,7 +181,7 @@ searchInput.addEventListener('keyup', function() {
 });
 
 
-// Écouteur de clic sur la carte pour les popups (la logique pour obtenir les coordonnées est retirée)
+// Écouteur de clic sur la carte pour les popups
 map.on('click', function(evt) {
     var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
         return feature;
