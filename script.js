@@ -9,21 +9,24 @@ var mapContainer = document.getElementById('map');
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 
-// Définition de l'icône du marqueur
-var markerIconStyle = new ol.style.Style({
-    image: new ol.style.Icon({
-        anchor: [0.5, 1], // Point d'ancrage de l'icône (centre en bas)
-        src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png', // Icône par défaut d'OpenLayers
-        // Si tu veux une icône personnalisée, tu peux la mettre dans 'data/' et utiliser : 'data/ton_icone.png'
-        // Exemple : 'data/urbex-marker.png'
-        scale: 1 // Ajuste la taille de l'icône si nécessaire (ex: 0.7 pour plus petit)
+// --- Définition du style du marqueur comme un point de Google Maps ---
+var markerPointStyle = new ol.style.Style({
+    image: new ol.style.Circle({
+        radius: 7, // Taille du cercle
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 0, 0, 0.8)' // Couleur de remplissage (Rouge, semi-transparent)
+        }),
+        stroke: new ol.style.Stroke({
+            color: 'white', // Contour blanc
+            width: 2 // Épaisseur du contour
+        })
     })
 });
 
 var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
 var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
-    style: markerIconStyle // Applique le style d'icône défini ci-dessus
+    style: markerPointStyle // Applique le nouveau style de point
 });
 
 // Création du conteneur popup
@@ -92,7 +95,7 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        displayMarkersAndList(allLocations); // <<< CETTE LIGNE A ÉTÉ REMISE : Affiche TOUS les marqueurs au démarrage
+        displayMarkersAndList(allLocations); // Affiche TOUS les marqueurs au démarrage
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
