@@ -9,24 +9,24 @@ var mapContainer = document.getElementById('map');
 // Données des lieux
 var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 
-// --- Définition du style du marqueur comme un point simple (comme Google Maps) ---
-var markerPointStyle = new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 7, // Taille du cercle en pixels
-        fill: new ol.style.Fill({
-            color: 'rgba(255, 0, 0, 0.8)' // Couleur de remplissage (Rouge semi-transparent)
-        }),
-        stroke: new ol.style.Stroke({
-            color: 'white', // Couleur du contour
-            width: 2 // Épaisseur du contour
-        })
+// --- Définition du style du marqueur comme une épingle Google Maps ---
+var markerGoogleMapsStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+        anchor: [0.5, 1], // Le point d'ancrage est le bas de l'épingle
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        // URL d'une icône qui ressemble à l'épingle Google Maps
+        src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png', // Cette icône est en fait l'épingle classique
+        // Note: L'icône précédente (le château) était probablement due à un cache ou une autre URL.
+        // Cette URL spécifique est la source pour l'épingle rouge d'OpenLayers.
+        scale: 1 // Ajuste la taille si nécessaire, 1 est la taille normale
     })
 });
 
 var vectorSource = new ol.source.Vector(); // Source pour les marqueurs OpenLayers
 var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
-    style: markerPointStyle // Applique le nouveau style de point simple
+    style: markerGoogleMapsStyle // Applique le style d'épingle Google Maps
 });
 
 // Création du conteneur popup
