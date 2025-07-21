@@ -1,5 +1,27 @@
 body { margin: 0; padding: 0; }
 #map { height: 100vh; width: 100vw; }
+
+/* Styles pour le conteneur de recherche */
+#search-container {
+    position: absolute; /* Permet de le positionner par rapport au body */
+    top: 10px; /* 10px du haut */
+    left: 50%; /* Centré horizontalement */
+    transform: translateX(-50%); /* Ajustement pour un centrage parfait */
+    z-index: 1000; /* Assure qu'il est au-dessus de la carte */
+    background-color: white;
+    padding: 8px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#search-input {
+    width: 250px; /* Largeur de la barre de recherche */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+}
+
 /* Styles pour les popups si tu veux personnaliser */
 .leaflet-popup-content p { margin: 0; }
 .leaflet-popup-content button {
