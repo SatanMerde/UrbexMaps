@@ -12,6 +12,9 @@ var allMarkers = [];
 var allLocations = [];
 // Référence à l'élément UL de la liste des résultats
 var resultsList = document.getElementById('results-list');
+// Référence au conteneur de la barre latérale
+var resultsSidebar = document.getElementById('results-sidebar');
+
 
 // Charger les lieux depuis le fichier JSON
 fetch('data/locations.json')
@@ -23,20 +26,30 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        displayMarkersAndList(allLocations); // Afficher tous les marqueurs et la liste au démarrage
+        // Ne pas appeler displayMarkersAndList ici pour que la liste soit vide au démarrage
+        // displayMarkersAndList(allLocations); 
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
 // Fonction pour afficher les marqueurs sur la carte ET mettre à jour la liste des résultats
 function displayMarkersAndList(locationsToDisplay) {
-    // 1. Supprimer tous les marqueurs existants
+    // Supprimer tous les marqueurs existants
     allMarkers.forEach(marker => map.removeLayer(marker));
     allMarkers = []; // Réinitialiser la liste des marqueurs
 
-    // 2. Vider la liste des résultats HTML
+    // Vider la liste des résultats HTML
     resultsList.innerHTML = '';
 
-    // 3. Ajouter les nouveaux marqueurs et les éléments à la liste
+    // Si des lieux sont à afficher, rendre la sidebar visible
+    if (locationsToDisplay.length > 0) {
+        resultsSidebar.style.display = 'block'; // Ou 'flex' si tu préfères
+    } else {
+        // Sinon, cacher la sidebar si la recherche ne donne aucun résultat
+        resultsSidebar.style.display = 'none';
+    }
+
+
+    // Ajouter les nouveaux marqueurs et les éléments à la liste
     locationsToDisplay.forEach(location => {
         // Création du marqueur
         var marker = L.marker([location.lat, location.lng]).addTo(map);
@@ -87,6 +100,14 @@ var searchInput = document.getElementById('search-input');
 searchInput.addEventListener('keyup', function() {
     var searchTerm = searchInput.value.toLowerCase(); // Récupérer le texte de recherche en minuscules
 
+    // Si la barre de recherche est vide, cacher la sidebar et vider les marqueurs
+    if (searchTerm === '') {
+        resultsSidebar.style.display = 'none';
+        allMarkers.forEach(marker => map.removeLayer(marker)); // Supprimer tous les marqueurs
+        allMarkers = []; // Réinitialiser la liste
+        return; // Sortir de la fonction
+    }
+
     var filteredLocations = allLocations.filter(location => {
         // Filtrer par nom ou description
         return location.name.toLowerCase().includes(searchTerm) ||
@@ -94,4 +115,9 @@ searchInput.addEventListener('keyup', function() {
     });
 
     displayMarkersAndList(filteredLocations); // Afficher uniquement les marqueurs filtrés et la liste
+});
+
+// Masquer la sidebar au chargement initial
+document.addEventListener('DOMContentLoaded', (event) => {
+    resultsSidebar.style.display = 'none';
 });
