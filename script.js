@@ -13,10 +13,9 @@ var allLocations = []; // Stockera tous les lieux après le chargement du JSON
 var markerIconStyle = new ol.style.Style({
     image: new ol.style.Icon({
         anchor: [0.5, 1], // Point d'ancrage de l'icône (centre en bas)
-        src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png', // Icône par défaut d'OpenLayers (tu peux la changer)
-        // EXEMPLES D'AUTRES ICONES :
-        // 'https://docs.mapbox.com/help/glossary/mapbox-logo.png' // Exemple d'icône Mapbox
-        // OU si tu as ton icône dans un dossier 'data/' : 'data/marker-urbex.png'
+        src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png', // Icône par défaut d'OpenLayers
+        // Si tu veux une icône personnalisée, tu peux la mettre dans 'data/' et utiliser : 'data/ton_icone.png'
+        // Exemple : 'data/urbex-marker.png'
         scale: 1 // Ajuste la taille de l'icône si nécessaire (ex: 0.7 pour plus petit)
     })
 });
@@ -93,8 +92,7 @@ fetch('data/locations.json')
     })
     .then(locations => {
         allLocations = locations; // Stocker tous les lieux
-        // Ne pas afficher tous les marqueurs au démarrage si la recherche est vide
-        // Ils seront affichés si l'utilisateur efface la recherche.
+        displayMarkersAndList(allLocations); // <<< CETTE LIGNE A ÉTÉ REMISE : Affiche TOUS les marqueurs au démarrage
     })
     .catch(error => console.error('Erreur lors du traitement des lieux:', error));
 
@@ -107,10 +105,10 @@ function displayMarkersAndList(locationsToDisplay) {
     resultsList.innerHTML = '';
 
     // Gérer la visibilité de la sidebar
-    if (locationsToDisplay.length > 0) {
-        resultsSidebar.style.display = 'block'; // Afficher la sidebar s'il y a des résultats
+    if (locationsToDisplay.length > 0 && searchInput.value !== '') { // La sidebar ne s'affiche que si recherche active ET résultats
+        resultsSidebar.style.display = 'block';
     } else {
-        resultsSidebar.style.display = 'none'; // Masquer la sidebar s'il n'y a pas de résultats
+        resultsSidebar.style.display = 'none'; // Masquer la sidebar
     }
 
     // Ajouter les nouveaux marqueurs OpenLayers et les éléments à la liste
@@ -123,39 +121,40 @@ function displayMarkersAndList(locationsToDisplay) {
         });
         vectorSource.addFeature(feature);
 
-        // Création de l'élément de liste
-        var listItem = document.createElement('li');
-        listItem.className = 'result-item';
-        listItem.innerHTML = `
-            <h3>${location.name}</h3>
-            <p>${location.description}</p>
-        `;
-        listItem.dataset.lon = location.lng; // Stocke la longitude
-        listItem.dataset.lat = location.lat; // Stocke la latitude
-
-        // Ajouter un écouteur d'événement pour le clic sur l'élément de liste
-        listItem.addEventListener('click', function() {
-            var lon = parseFloat(this.dataset.lon);
-            var lat = parseFloat(this.dataset.lat);
-            
-            // Centrer la carte sur le marqueur
-            map.getView().animate({
-                center: ol.proj.fromLonLat([lon, lat]),
-                zoom: 15,
-                duration: 500
-            });
-
-            // Afficher le popup
-            popupContent.innerHTML = `
+        // Création de l'élément de liste (ajouté seulement si recherche active)
+        if (searchInput.value !== '') {
+            var listItem = document.createElement('li');
+            listItem.className = 'result-item';
+            listItem.innerHTML = `
                 <h3>${location.name}</h3>
                 <p>${location.description}</p>
-                ${location.image ? `<img src="${location.image}" alt="${location.name}">` : ''}
-                <button onclick="openGoogleMaps(${location.lat}, ${location.lng})">Voir sur Google Maps (Satellite)</button>
             `;
-            popupOverlay.setPosition(ol.proj.fromLonLat([lon, lat]));
-        });
+            listItem.dataset.lon = location.lng; // Stocke la longitude
+            listItem.dataset.lat = location.lat; // Stocke la latitude
 
-        resultsList.appendChild(listItem); // Ajouter l'élément à la liste HTML
+            // Ajouter un écouteur d'événement pour le clic sur l'élément de liste
+            listItem.addEventListener('click', function() {
+                var lon = parseFloat(this.dataset.lon);
+                var lat = parseFloat(this.dataset.lat);
+                
+                // Centrer la carte sur le marqueur
+                map.getView().animate({
+                    center: ol.proj.fromLonLat([lon, lat]),
+                    zoom: 15,
+                    duration: 500
+                });
+
+                // Afficher le popup
+                popupContent.innerHTML = `
+                    <h3>${location.name}</h3>
+                    <p>${location.description}</p>
+                    ${location.image ? `<img src="${location.image}" alt="${location.name}">` : ''}
+                    <button onclick="openGoogleMaps(${location.lat}, ${location.lng})">Voir sur Google Maps (Satellite)</button>
+                `;
+                popupOverlay.setPosition(ol.proj.fromLonLat([lon, lat]));
+            });
+            resultsList.appendChild(listItem); // Ajouter l'élément à la liste HTML
+        }
     });
 }
 
@@ -173,8 +172,7 @@ searchInput.addEventListener('keyup', function() {
     var searchTerm = searchInput.value.toLowerCase();
 
     if (searchTerm === '') {
-        // Si la recherche est vide, ne pas afficher de marqueurs ni de résultats
-        vectorSource.clear(); // Supprime tous les marqueurs de la carte
+        displayMarkersAndList(allLocations); // Affiche TOUS les marqueurs si la recherche est vide
         resultsSidebar.style.display = 'none'; // Masque la sidebar
         popupOverlay.setPosition(undefined); // Cacher le popup
         return;
@@ -215,5 +213,5 @@ map.on('click', function(evt) {
 
 // Masquer la sidebar au chargement initial
 document.addEventListener('DOMContentLoaded', (event) => {
-    resultsSidebar.style.display = 'none'; // S'assurer que la sidebar est cachée au démarrage
+    // La sidebar est déjà masquée par CSS, et elle est gérée par displayMarkersAndList
 });
