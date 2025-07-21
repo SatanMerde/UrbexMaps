@@ -1,28 +1,99 @@
-body { margin: 0; padding: 0; }
-#map { height: 100vh; width: 100vw; }
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex; /* Utilise flexbox pour la mise en page principale */
+    flex-direction: column; /* Empile les éléments verticalement */
+    height: 100vh; /* Prend toute la hauteur de la fenêtre */
+}
 
-/* Styles pour le conteneur de recherche */
+/* Conteneur principal pour la barre de recherche */
 #search-container {
-    position: absolute; /* Permet de le positionner par rapport au body */
-    top: 10px; /* 10px du haut */
-    left: 50%; /* Centré horizontalement */
-    transform: translateX(-50%); /* Ajustement pour un centrage parfait */
+    position: relative; /* Pas absolu ici, il est dans le flux normal */
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 1000; /* Assure qu'il est au-dessus de la carte */
-    background-color: white;
-    padding: 8px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 #search-input {
-    width: 250px; /* Largeur de la barre de recherche */
-    padding: 8px;
+    width: 80%; /* Largeur de la barre de recherche */
+    max-width: 400px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 5px;
     font-size: 16px;
 }
 
-/* Styles pour les popups si tu veux personnaliser */
+/* Conteneur principal pour la sidebar et la carte */
+#main-content {
+    display: flex; /* Utilise flexbox pour la sidebar et la carte */
+    flex-grow: 1; /* Prend l'espace restant verticalement */
+}
+
+/* Styles de la barre latérale des résultats */
+#results-sidebar {
+    width: 300px; /* Largeur fixe de la barre latérale */
+    background-color: #f4f4f4;
+    padding: 15px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto; /* Permet le défilement si la liste est longue */
+    flex-shrink: 0; /* Empêche la sidebar de rétrécir */
+}
+
+#results-sidebar h2 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.2em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+#results-list {
+    list-style: none; /* Supprime les puces de liste */
+    padding: 0;
+    margin: 0;
+}
+
+.result-item {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.result-item:hover {
+    background-color: #e9e9e9;
+}
+
+.result-item h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    color: #007bff; /* Couleur bleue pour le titre */
+}
+
+.result-item p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #555;
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    overflow: hidden; /* Cache le texte qui dépasse */
+    text-overflow: ellipsis; /* Ajoute des points de suspension si le texte est trop long */
+}
+
+/* Styles de la carte */
+#map {
+    flex-grow: 1; /* La carte prend tout l'espace restant */
+    height: 100%; /* S'assure que la carte remplit son conteneur */
+}
+
+/* Styles pour les popups Leaflet */
 .leaflet-popup-content p { margin: 0; }
 .leaflet-popup-content button {
     display: block;
@@ -36,4 +107,24 @@ body { margin: 0; padding: 0; }
 }
 .leaflet-popup-content button:hover {
     background-color: #286090;
+}
+
+/* Media Queries pour les petits écrans (smartphones) */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column; /* Revenir à une disposition en colonne */
+    }
+    #main-content {
+        flex-direction: column; /* Empile la sidebar et la carte */
+    }
+    #results-sidebar {
+        width: auto; /* Largeur automatique */
+        height: 200px; /* Hauteur fixe pour la sidebar sur mobile */
+        flex-shrink: 1;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #eee;
+    }
+    #map {
+        height: calc(100vh - 200px - 60px); /* Hauteur de l'écran - hauteur sidebar - hauteur barre recherche */
+    }
 }
