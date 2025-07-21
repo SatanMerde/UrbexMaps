@@ -15,8 +15,8 @@ var vectorLayer = new ol.layer.Vector({
     style: new ol.style.Style({
         image: new ol.style.Icon({
             anchor: [0.5, 1],
-            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut Leaflet (tu peux la changer)
-            // Ou une icône personnalisée si tu la places dans 'data/marker-icon.png' : 'data/marker-icon.png'
+            src: 'https://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png' // Icône de marqueur par défaut OpenLayers
+            // Si tu veux utiliser une icône personnalisée, assure-toi qu'elle est dans 'data/marker-icon.png' : 'data/marker-icon.png'
         })
     })
 });
@@ -51,43 +51,33 @@ popupCloser.onclick = function() {
 };
 
 
-// Définition des fonds de carte avec des URLs plus fiables
+// Définition des fonds de carte avec des URLs fiables
 const osmLayer = new ol.layer.Tile({
     source: new ol.source.OSM(),
     properties: { name: 'osm' }
 });
 
-// Google Satellite
-const googleSatelliteLayer = new ol.layer.Tile({
+// Satellite (Esri World Imagery) - Très fiable
+const esriSatelliteLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
-        url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-        attributions: '© Google',
-        maxZoom: 20
-    }),
-    properties: { name: 'google-satellite' }
-});
-
-// Google Hybrid (Satellite avec rues et labels)
-const googleHybridLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-        attributions: '© Google',
-        maxZoom: 20
-    }),
-    properties: { name: 'google-hybrid' }
-});
-
-// Esri World Terrain (Topo Map)
-const esriTerrainLayer = new ol.layer.Tile({
-    source: new ol.source.XYZ({
-        attributions: 'Tiles © Esri — Esri, DeLorme, HERE, TomTom, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+        attributions: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         maxZoom: 19
     }),
-    properties: { name: 'esri-terrain' }
+    properties: { name: 'esri-satellite' }
 });
 
-// CartoDB Dark Matter (Foncé)
+// Terrain (OpenTopoMap) - Excellent pour le relief et les détails topographiques
+const openTopoMapLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: 'Map data: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: © <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+        url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        maxZoom: 17
+    }),
+    properties: { name: 'opentopomap-terrain' }
+});
+
+// Foncé (CartoDB Dark Matter) - Stable
 const cartoDarkLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
         attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -96,6 +86,17 @@ const cartoDarkLayer = new ol.layer.Tile({
     }),
     properties: { name: 'carto-dark' }
 });
+
+// Rues (CartoDB Positron) - Vue claire de rues
+const cartoPositronLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: '© <a href="https://carto.com/attributions">Carto</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+        maxZoom: 19
+    }),
+    properties: { name: 'carto-positron' }
+});
+
 
 // Initialisation de la carte OpenLayers
 var map = new ol.Map({
@@ -132,17 +133,17 @@ function changeOpenLayersBasemap(style) {
         case 'osm':
             map.addLayer(osmLayer);
             break;
-        case 'google-satellite':
-            map.addLayer(googleSatelliteLayer);
+        case 'esri-satellite':
+            map.addLayer(esriSatelliteLayer);
             break;
-        case 'google-hybrid':
-            map.addLayer(googleHybridLayer);
-            break;
-        case 'esri-terrain':
-            map.addLayer(esriTerrainLayer);
+        case 'opentopomap-terrain':
+            map.addLayer(openTopoMapLayer);
             break;
         case 'carto-dark':
             map.addLayer(cartoDarkLayer);
+            break;
+        case 'carto-positron':
+            map.addLayer(cartoPositronLayer);
             break;
         default:
             map.addLayer(osmLayer); // Fallback
